@@ -223,3 +223,26 @@ type ListEmailsOptions struct {
 	Status EmailStatus `json:"status,omitempty"`
 	Tag    string      `json:"tag,omitempty"`
 }
+
+// SuppressionReason represents the reason for suppression.
+type SuppressionReason string
+
+const (
+	SuppressionReasonHardBounce SuppressionReason = "hard_bounce"
+	SuppressionReasonComplaint  SuppressionReason = "complaint"
+)
+
+// Suppression represents a suppressed email address.
+type Suppression struct {
+	ID            string            `json:"id"`
+	Email         string            `json:"email"`
+	Reason        SuppressionReason `json:"reason"`
+	SourceEmailID string            `json:"sourceEmailId,omitempty"`
+	CreatedAt     string            `json:"createdAt"`
+}
+
+// SuppressionListResponse represents the response from listing suppressions.
+type SuppressionListResponse struct {
+	Data  []Suppression `json:"data"`
+	Total int           `json:"total"`
+}

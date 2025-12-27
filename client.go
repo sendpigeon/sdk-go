@@ -8,11 +8,12 @@ import (
 
 // Client is the SendPigeon API client.
 type Client struct {
-	http      *httpClient
-	Emails    *EmailsService
-	Templates *TemplatesService
-	Domains   *DomainsService
-	APIKeys   *APIKeysService
+	http         *httpClient
+	Emails       *EmailsService
+	Templates    *TemplatesService
+	Domains      *DomainsService
+	APIKeys      *APIKeysService
+	Suppressions *SuppressionsService
 }
 
 // New creates a new SendPigeon client.
@@ -28,11 +29,12 @@ type Client struct {
 func New(apiKey string, opts *ClientOptions) *Client {
 	http := newHTTPClient(apiKey, opts)
 	return &Client{
-		http:      http,
-		Emails:    &EmailsService{http: http},
-		Templates: &TemplatesService{http: http},
-		Domains:   &DomainsService{http: http},
-		APIKeys:   &APIKeysService{http: http},
+		http:         http,
+		Emails:       &EmailsService{http: http},
+		Templates:    &TemplatesService{http: http},
+		Domains:      &DomainsService{http: http},
+		APIKeys:      &APIKeysService{http: http},
+		Suppressions: &SuppressionsService{http: http},
 	}
 }
 
