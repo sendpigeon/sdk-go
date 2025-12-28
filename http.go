@@ -8,12 +8,14 @@ import (
 	"io"
 	"math"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
 
 const (
 	defaultBaseURL    = "https://api.sendpigeon.dev"
+	devBaseURL        = "http://localhost:4100"
 	defaultTimeout    = 30 * time.Second
 	defaultMaxRetries = 2
 	maxRetries        = 5
@@ -60,6 +62,14 @@ func newHTTPClient(apiKey string, opts *ClientOptions) *httpClient {
 		}
 		debug = opts.Debug
 		client = opts.HTTPClient
+	}
+
+	// Check for dev mode if no explicit base URL was set
+	if baseURL == defaultBaseURL {
+		if devMode := os.Getenv("SENDPIGEON_DEV"); devMode == "true" || devMode == "1" {
+			baseURL = devBaseURL
+			fmt.Printf("\033[35m[SendPigeon]\033[0m Dev mode → %s\n", devBaseURL)
+		}
 	}
 
 	if client == nil {
