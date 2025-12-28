@@ -40,6 +40,23 @@ const (
 	APIKeyPermissionSending    APIKeyPermission = "sending"
 )
 
+// TemplateStatus represents the status of a template.
+type TemplateStatus string
+
+const (
+	TemplateStatusDraft     TemplateStatus = "draft"
+	TemplateStatusPublished TemplateStatus = "published"
+)
+
+// TemplateVariableType represents the type of a template variable.
+type TemplateVariableType string
+
+const (
+	TemplateVariableTypeString  TemplateVariableType = "string"
+	TemplateVariableTypeNumber  TemplateVariableType = "number"
+	TemplateVariableTypeBoolean TemplateVariableType = "boolean"
+)
+
 // Attachment represents an email attachment.
 type Attachment struct {
 	Filename    string `json:"filename"`
@@ -120,34 +137,58 @@ type EmailDetail struct {
 	HasBody       bool             `json:"has_body"`
 }
 
+// TemplateVariable represents a typed variable in a template.
+type TemplateVariable struct {
+	Key           string               `json:"key"`
+	Type          TemplateVariableType `json:"type"`
+	FallbackValue string               `json:"fallbackValue,omitempty"`
+}
+
 // Template represents an email template.
 type Template struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Subject   string                 `json:"subject"`
-	Variables []string               `json:"variables"`
-	CreatedAt string                 `json:"created_at"`
-	UpdatedAt string                 `json:"updated_at"`
-	HTML      string                 `json:"html,omitempty"`
-	Text      string                 `json:"text,omitempty"`
-	Domain    map[string]interface{} `json:"domain,omitempty"`
+	ID         string                 `json:"id"`
+	TemplateID string                 `json:"templateId"`
+	Name       string                 `json:"name,omitempty"`
+	Subject    string                 `json:"subject"`
+	Variables  []TemplateVariable     `json:"variables"`
+	Status     TemplateStatus         `json:"status"`
+	CreatedAt  string                 `json:"createdAt"`
+	UpdatedAt  string                 `json:"updatedAt"`
+	HTML       string                 `json:"html,omitempty"`
+	Text       string                 `json:"text,omitempty"`
+	Domain     map[string]interface{} `json:"domain,omitempty"`
 }
 
 // CreateTemplateRequest represents a request to create a template.
 type CreateTemplateRequest struct {
-	Name     string `json:"name"`
-	Subject  string `json:"subject"`
-	HTML     string `json:"html,omitempty"`
-	Text     string `json:"text,omitempty"`
-	DomainID string `json:"domainId,omitempty"`
+	TemplateID string             `json:"templateId"`
+	Name       string             `json:"name,omitempty"`
+	Subject    string             `json:"subject"`
+	HTML       string             `json:"html,omitempty"`
+	Text       string             `json:"text,omitempty"`
+	Variables  []TemplateVariable `json:"variables,omitempty"`
+	DomainID   string             `json:"domainId,omitempty"`
 }
 
 // UpdateTemplateRequest represents a request to update a template.
 type UpdateTemplateRequest struct {
-	Name    string `json:"name,omitempty"`
-	Subject string `json:"subject,omitempty"`
-	HTML    string `json:"html,omitempty"`
-	Text    string `json:"text,omitempty"`
+	Name      string             `json:"name,omitempty"`
+	Subject   string             `json:"subject,omitempty"`
+	HTML      string             `json:"html,omitempty"`
+	Text      string             `json:"text,omitempty"`
+	Variables []TemplateVariable `json:"variables,omitempty"`
+}
+
+// TestTemplateRequest represents a request to test a template.
+type TestTemplateRequest struct {
+	To        string            `json:"to"`
+	Variables map[string]string `json:"variables,omitempty"`
+}
+
+// TestTemplateResponse represents the response from testing a template.
+type TestTemplateResponse struct {
+	Message string `json:"message"`
+	EmailID string `json:"emailId"`
 }
 
 // DNSRecord represents a DNS record for domain verification.
@@ -215,13 +256,6 @@ type ListOptions struct {
 	Limit  int    `json:"limit,omitempty"`
 	Offset int    `json:"offset,omitempty"`
 	Cursor string `json:"cursor,omitempty"`
-}
-
-// ListEmailsOptions represents options for listing emails.
-type ListEmailsOptions struct {
-	ListOptions
-	Status EmailStatus `json:"status,omitempty"`
-	Tag    string      `json:"tag,omitempty"`
 }
 
 // SuppressionReason represents the reason for suppression.

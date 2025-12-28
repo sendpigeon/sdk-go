@@ -120,12 +120,6 @@ for _, result := range resp.Data {
 // Get email by ID
 email, err := client.Emails.Get(ctx, "email_xxx")
 
-// List emails
-emails, err := client.Emails.List(ctx, &sendpigeon.ListEmailsOptions{
-    Limit:  20,
-    Status: sendpigeon.EmailStatusDelivered,
-})
-
 // Cancel scheduled email
 cancelled, err := client.Emails.Cancel(ctx, "email_xxx")
 ```

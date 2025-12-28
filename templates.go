@@ -94,3 +94,48 @@ func (s *TemplatesService) Delete(ctx context.Context, id string) *Error {
 	_, err := s.http.Delete(ctx, "/v1/templates/"+id, nil)
 	return err
 }
+
+// Publish publishes a template.
+func (s *TemplatesService) Publish(ctx context.Context, id string) (*Template, *Error) {
+	body, err := s.http.Post(ctx, "/v1/templates/"+id+"/publish", nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp Template
+	if jsonErr := json.Unmarshal(body, &resp); jsonErr != nil {
+		return nil, NewError(ErrorCodeNetwork, "failed to parse response")
+	}
+
+	return &resp, nil
+}
+
+// Unpublish unpublishes a template.
+func (s *TemplatesService) Unpublish(ctx context.Context, id string) (*Template, *Error) {
+	body, err := s.http.Post(ctx, "/v1/templates/"+id+"/unpublish", nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp Template
+	if jsonErr := json.Unmarshal(body, &resp); jsonErr != nil {
+		return nil, NewError(ErrorCodeNetwork, "failed to parse response")
+	}
+
+	return &resp, nil
+}
+
+// Test sends a test email using the template.
+func (s *TemplatesService) Test(ctx context.Context, id string, req TestTemplateRequest) (*TestTemplateResponse, *Error) {
+	body, err := s.http.Post(ctx, "/v1/templates/"+id+"/test", req, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp TestTemplateResponse
+	if jsonErr := json.Unmarshal(body, &resp); jsonErr != nil {
+		return nil, NewError(ErrorCodeNetwork, "failed to parse response")
+	}
+
+	return &resp, nil
+}
