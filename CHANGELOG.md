@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Per-email tracking: `Tracking: &TrackingOptions{Opens: &opens, Clicks: &clicks}` in send requests
+- Response `Warnings` field for non-fatal issues (e.g., tracking disabled at org level)
+- Updated `TrackingDefaults` to use `TrackingEnabled` master toggle
+
 ## 0.3.0
 
 - Add Suppressions API (`Suppressions.List`, `Suppressions.Delete`)

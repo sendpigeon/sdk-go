@@ -57,6 +57,12 @@ const (
 	TemplateVariableTypeBoolean TemplateVariableType = "boolean"
 )
 
+// TrackingOptions represents per-email tracking options.
+type TrackingOptions struct {
+	Opens  *bool `json:"opens,omitempty"`
+	Clicks *bool `json:"clicks,omitempty"`
+}
+
 // Attachment represents an email attachment.
 type Attachment struct {
 	Filename    string `json:"filename"`
@@ -89,6 +95,7 @@ type SendEmailRequest struct {
 	Metadata       map[string]string `json:"metadata,omitempty"`
 	Headers        map[string]string `json:"headers,omitempty"`
 	ScheduledAt    string            `json:"scheduled_at,omitempty"`
+	Tracking       *TrackingOptions  `json:"tracking,omitempty"`
 	IdempotencyKey string            `json:"-"` // Sent as header
 }
 
@@ -98,6 +105,7 @@ type SendEmailResponse struct {
 	Status      EmailStatus `json:"status"`
 	ScheduledAt string      `json:"scheduled_at,omitempty"`
 	Suppressed  []string    `json:"suppressed,omitempty"`
+	Warnings    []string    `json:"warnings,omitempty"`
 }
 
 // BatchEmailResult represents the result for a single email in a batch.
@@ -106,6 +114,7 @@ type BatchEmailResult struct {
 	Status     string                 `json:"status"`
 	ID         string                 `json:"id,omitempty"`
 	Suppressed []string               `json:"suppressed,omitempty"`
+	Warnings   []string               `json:"warnings,omitempty"`
 	Error      map[string]interface{} `json:"error,omitempty"`
 }
 
@@ -279,4 +288,20 @@ type Suppression struct {
 type SuppressionListResponse struct {
 	Data  []Suppression `json:"data"`
 	Total int           `json:"total"`
+}
+
+// TrackingDefaults represents organization tracking defaults.
+type TrackingDefaults struct {
+	TrackingEnabled     bool `json:"trackingEnabled"`
+	PrivacyMode         bool `json:"privacyMode"`
+	WebhookOnEveryOpen  bool `json:"webhookOnEveryOpen"`
+	WebhookOnEveryClick bool `json:"webhookOnEveryClick"`
+}
+
+// UpdateTrackingDefaultsRequest represents a request to update tracking defaults.
+type UpdateTrackingDefaultsRequest struct {
+	TrackingEnabled     *bool `json:"trackingEnabled,omitempty"`
+	PrivacyMode         *bool `json:"privacyMode,omitempty"`
+	WebhookOnEveryOpen  *bool `json:"webhookOnEveryOpen,omitempty"`
+	WebhookOnEveryClick *bool `json:"webhookOnEveryClick,omitempty"`
 }

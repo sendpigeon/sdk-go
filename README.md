@@ -128,6 +128,32 @@ for _, result := range resp.Data {
 }
 ```
 
+### Tracking
+
+Enable open/click tracking per email (opt-in):
+
+```go
+opens := true
+clicks := true
+
+resp, err := client.Send(ctx, sendpigeon.SendEmailRequest{
+    To:      []string{"user@example.com"},
+    Subject: "Welcome!",
+    HTML:    `<p>Check out our <a href="https://example.com">site</a>!</p>`,
+    Tracking: &sendpigeon.TrackingOptions{
+        Opens:  &opens,
+        Clicks: &clicks,
+    },
+})
+
+// Response may include warnings if tracking is disabled at org level
+if len(resp.Warnings) > 0 {
+    fmt.Println("Warnings:", resp.Warnings)
+}
+```
+
+Configure organization defaults in Settings → Tracking.
+
 ## Email Management
 
 ```go
