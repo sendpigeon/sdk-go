@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+- Add Contacts API (`Contacts.List`, `Create`, `Batch`, `Get`, `Update`, `Delete`, `Unsubscribe`, `Resubscribe`, `Stats`, `Tags`)
+- Add Broadcasts API (`Broadcasts.List`, `Create`, `Get`, `Update`, `Delete`, `Send`, `Schedule`, `Cancel`, `Test`, `Recipients`, `Analytics`)
+- Broadcast targeting: `IncludeTags` and `ExcludeTags` options
+
 ## 0.4.0
 
 - Per-email tracking: `Tracking: &TrackingOptions{Opens: &opens, Clicks: &clicks}` in send requests

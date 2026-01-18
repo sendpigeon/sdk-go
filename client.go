@@ -15,6 +15,8 @@ type Client struct {
 	APIKeys      *APIKeysService
 	Suppressions *SuppressionsService
 	Tracking     *TrackingService
+	Contacts     *ContactsService
+	Broadcasts   *BroadcastsService
 }
 
 // New creates a new SendPigeon client.
@@ -37,6 +39,8 @@ func New(apiKey string, opts *ClientOptions) *Client {
 		APIKeys:      &APIKeysService{http: http},
 		Suppressions: &SuppressionsService{http: http},
 		Tracking:     &TrackingService{http: http},
+		Contacts:     &ContactsService{http: http},
+		Broadcasts:   &BroadcastsService{http: http},
 	}
 }
 

@@ -305,3 +305,253 @@ type UpdateTrackingDefaultsRequest struct {
 	WebhookOnEveryOpen  *bool `json:"webhookOnEveryOpen,omitempty"`
 	WebhookOnEveryClick *bool `json:"webhookOnEveryClick,omitempty"`
 }
+
+// ContactStatus represents the status of a contact.
+type ContactStatus string
+
+const (
+	ContactStatusActive       ContactStatus = "ACTIVE"
+	ContactStatusUnsubscribed ContactStatus = "UNSUBSCRIBED"
+	ContactStatusBounced      ContactStatus = "BOUNCED"
+	ContactStatusComplained   ContactStatus = "COMPLAINED"
+)
+
+// Contact represents a contact in the audience.
+type Contact struct {
+	ID             string            `json:"id"`
+	Email          string            `json:"email"`
+	Fields         map[string]string `json:"fields,omitempty"`
+	Tags           []string          `json:"tags,omitempty"`
+	Status         ContactStatus     `json:"status"`
+	UnsubscribedAt string            `json:"unsubscribedAt,omitempty"`
+	BouncedAt      string            `json:"bouncedAt,omitempty"`
+	ComplainedAt   string            `json:"complainedAt,omitempty"`
+	CreatedAt      string            `json:"createdAt"`
+	UpdatedAt      string            `json:"updatedAt"`
+}
+
+// CreateContactRequest represents a request to create a contact.
+type CreateContactRequest struct {
+	Email  string            `json:"email"`
+	Fields map[string]string `json:"fields,omitempty"`
+	Tags   []string          `json:"tags,omitempty"`
+}
+
+// UpdateContactRequest represents a request to update a contact.
+type UpdateContactRequest struct {
+	Email  string            `json:"email,omitempty"`
+	Fields map[string]string `json:"fields,omitempty"`
+	Tags   []string          `json:"tags,omitempty"`
+}
+
+// BatchContactInput represents a single contact in a batch operation.
+type BatchContactInput struct {
+	Email  string            `json:"email"`
+	Fields map[string]string `json:"fields,omitempty"`
+	Tags   []string          `json:"tags,omitempty"`
+}
+
+// BatchContactResult represents the result for a single contact in batch.
+type BatchContactResult struct {
+	Index   int      `json:"index"`
+	Status  string   `json:"status"`
+	ID      string   `json:"id,omitempty"`
+	Email   string   `json:"email,omitempty"`
+	Error   string   `json:"error,omitempty"`
+	Message string   `json:"message,omitempty"`
+}
+
+// BatchContactResponse represents the response from batch contact creation.
+type BatchContactResponse struct {
+	Data    []BatchContactResult `json:"data"`
+	Summary struct {
+		Total   int `json:"total"`
+		Created int `json:"created"`
+		Updated int `json:"updated"`
+		Failed  int `json:"failed"`
+	} `json:"summary"`
+}
+
+// AudienceStats represents contact statistics.
+type AudienceStats struct {
+	Total        int `json:"total"`
+	Active       int `json:"active"`
+	Unsubscribed int `json:"unsubscribed"`
+	Bounced      int `json:"bounced"`
+	Complained   int `json:"complained"`
+}
+
+// ListContactsOptions represents options for listing contacts.
+type ListContactsOptions struct {
+	Limit  int      `json:"limit,omitempty"`
+	Offset int      `json:"offset,omitempty"`
+	Cursor string   `json:"cursor,omitempty"`
+	Tags   []string `json:"tags,omitempty"`
+	Status string   `json:"status,omitempty"`
+	Search string   `json:"search,omitempty"`
+}
+
+// BroadcastStatus represents the status of a broadcast.
+type BroadcastStatus string
+
+const (
+	BroadcastStatusDraft     BroadcastStatus = "DRAFT"
+	BroadcastStatusScheduled BroadcastStatus = "SCHEDULED"
+	BroadcastStatusSending   BroadcastStatus = "SENDING"
+	BroadcastStatusSent      BroadcastStatus = "SENT"
+	BroadcastStatusCancelled BroadcastStatus = "CANCELLED"
+	BroadcastStatusFailed    BroadcastStatus = "FAILED"
+)
+
+// BroadcastStats represents broadcast delivery statistics.
+type BroadcastStats struct {
+	Total      int `json:"total"`
+	Sent       int `json:"sent"`
+	Delivered  int `json:"delivered"`
+	Opened     int `json:"opened"`
+	Clicked    int `json:"clicked"`
+	Bounced    int `json:"bounced"`
+	Complained int `json:"complained"`
+	Failed     int `json:"failed"`
+}
+
+// Broadcast represents a broadcast campaign.
+type Broadcast struct {
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	Subject     string          `json:"subject"`
+	PreviewText string          `json:"previewText,omitempty"`
+	FromEmail   string          `json:"fromEmail,omitempty"`
+	FromName    string          `json:"fromName,omitempty"`
+	ReplyTo     string          `json:"replyTo,omitempty"`
+	HTMLContent string          `json:"htmlContent,omitempty"`
+	TextContent string          `json:"textContent,omitempty"`
+	Tags        []string        `json:"tags,omitempty"`
+	Status      BroadcastStatus `json:"status"`
+	Stats       *BroadcastStats `json:"stats,omitempty"`
+	ScheduledAt string          `json:"scheduledAt,omitempty"`
+	SentAt      string          `json:"sentAt,omitempty"`
+	CreatedAt   string          `json:"createdAt"`
+	UpdatedAt   string          `json:"updatedAt"`
+}
+
+// CreateBroadcastRequest represents a request to create a broadcast.
+type CreateBroadcastRequest struct {
+	Name        string   `json:"name"`
+	Subject     string   `json:"subject"`
+	PreviewText string   `json:"previewText,omitempty"`
+	FromEmail   string   `json:"fromEmail,omitempty"`
+	FromName    string   `json:"fromName,omitempty"`
+	ReplyTo     string   `json:"replyTo,omitempty"`
+	HTMLContent string   `json:"htmlContent,omitempty"`
+	TextContent string   `json:"textContent,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
+	TemplateID  string   `json:"templateId,omitempty"`
+}
+
+// UpdateBroadcastRequest represents a request to update a broadcast.
+type UpdateBroadcastRequest struct {
+	Name        string   `json:"name,omitempty"`
+	Subject     string   `json:"subject,omitempty"`
+	PreviewText string   `json:"previewText,omitempty"`
+	FromEmail   string   `json:"fromEmail,omitempty"`
+	FromName    string   `json:"fromName,omitempty"`
+	ReplyTo     string   `json:"replyTo,omitempty"`
+	HTMLContent string   `json:"htmlContent,omitempty"`
+	TextContent string   `json:"textContent,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
+}
+
+// BroadcastTargeting represents tag-based targeting for broadcasts.
+type BroadcastTargeting struct {
+	// Only send to contacts with ANY of these tags. Empty = all active contacts.
+	IncludeTags []string `json:"includeTags,omitempty"`
+	// Exclude contacts with ANY of these tags.
+	ExcludeTags []string `json:"excludeTags,omitempty"`
+}
+
+// SendBroadcastRequest represents a request to send a broadcast.
+type SendBroadcastRequest struct {
+	BroadcastTargeting
+}
+
+// ScheduleBroadcastRequest represents a request to schedule a broadcast.
+type ScheduleBroadcastRequest struct {
+	ScheduledAt string `json:"scheduledAt"`
+	BroadcastTargeting
+}
+
+// TestBroadcastRequest represents a request to send a test broadcast.
+type TestBroadcastRequest struct {
+	To []string `json:"to"`
+}
+
+// TestBroadcastResponse represents the response from sending a test.
+type TestBroadcastResponse struct {
+	Message  string   `json:"message"`
+	EmailIDs []string `json:"emailIds"`
+}
+
+// BroadcastRecipientStatus represents the status of a broadcast recipient.
+type BroadcastRecipientStatus string
+
+const (
+	BroadcastRecipientStatusPending    BroadcastRecipientStatus = "PENDING"
+	BroadcastRecipientStatusSent       BroadcastRecipientStatus = "SENT"
+	BroadcastRecipientStatusDelivered  BroadcastRecipientStatus = "DELIVERED"
+	BroadcastRecipientStatusOpened     BroadcastRecipientStatus = "OPENED"
+	BroadcastRecipientStatusClicked    BroadcastRecipientStatus = "CLICKED"
+	BroadcastRecipientStatusBounced    BroadcastRecipientStatus = "BOUNCED"
+	BroadcastRecipientStatusComplained BroadcastRecipientStatus = "COMPLAINED"
+	BroadcastRecipientStatusFailed     BroadcastRecipientStatus = "FAILED"
+)
+
+// BroadcastRecipient represents a recipient of a broadcast.
+type BroadcastRecipient struct {
+	ID          string                   `json:"id"`
+	ContactID   string                   `json:"contactId"`
+	Email       string                   `json:"email"`
+	Status      BroadcastRecipientStatus `json:"status"`
+	SentAt      string                   `json:"sentAt,omitempty"`
+	DeliveredAt string                   `json:"deliveredAt,omitempty"`
+	OpenedAt    string                   `json:"openedAt,omitempty"`
+	ClickedAt   string                   `json:"clickedAt,omitempty"`
+	BouncedAt   string                   `json:"bouncedAt,omitempty"`
+	FailedAt    string                   `json:"failedAt,omitempty"`
+}
+
+// ListBroadcastsOptions represents options for listing broadcasts.
+type ListBroadcastsOptions struct {
+	Limit  int    `json:"limit,omitempty"`
+	Offset int    `json:"offset,omitempty"`
+	Cursor string `json:"cursor,omitempty"`
+	Status string `json:"status,omitempty"`
+}
+
+// ListRecipientsOptions represents options for listing broadcast recipients.
+type ListRecipientsOptions struct {
+	Limit  int    `json:"limit,omitempty"`
+	Offset int    `json:"offset,omitempty"`
+	Cursor string `json:"cursor,omitempty"`
+	Status string `json:"status,omitempty"`
+}
+
+// OpensOverTime represents opens data for a time period.
+type OpensOverTime struct {
+	Date   string `json:"date"`
+	Opens  int    `json:"opens"`
+	Unique int    `json:"unique"`
+}
+
+// LinkPerformance represents click data for a link.
+type LinkPerformance struct {
+	URL    string `json:"url"`
+	Clicks int    `json:"clicks"`
+	Unique int    `json:"unique"`
+}
+
+// BroadcastAnalytics represents detailed broadcast analytics.
+type BroadcastAnalytics struct {
+	OpensOverTime   []OpensOverTime   `json:"opensOverTime"`
+	LinkPerformance []LinkPerformance `json:"linkPerformance"`
+}
