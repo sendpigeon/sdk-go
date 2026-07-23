@@ -138,11 +138,10 @@ func TestAPIError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)
+		// The real API returns a flat body, not nested under "error".
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"error": map[string]interface{}{
-				"code":    "validation_error",
-				"message": "Subject is required",
-			},
+			"code":    "validation_error",
+			"message": "Subject is required",
 		})
 	}))
 	defer server.Close()
@@ -163,5 +162,51 @@ func TestAPIError(t *testing.T) {
 	}
 	if err.Status != 400 {
 		t.Errorf("expected status 400, got %d", err.Status)
+	}
+	if err.Message != "Subject is required" {
+		t.Errorf("expected 'Subject is required', got %q", err.Message)
+	}
+}
+
+func TestAPIErrorDetails(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(429)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"message":             "Daily sending limit reached (5000/5000 in the last 24h)",
+			"code":                "DAILY_LIMIT_EXCEEDED",
+			"daily_limit":         5000,
+			"daily_used":          5000,
+			"daily_remaining":     0,
+			"retry_after_seconds": 3600,
+		})
+	}))
+	defer server.Close()
+
+	client := New("sk_test_xxx", &ClientOptions{BaseURL: server.URL, MaxRetries: 0})
+	_, err := client.Send(context.Background(), SendEmailRequest{
+		To: []string{"user@example.com"},
+	})
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if err.APICode != "DAILY_LIMIT_EXCEEDED" {
+		t.Errorf("expected DAILY_LIMIT_EXCEEDED, got %s", err.APICode)
+	}
+	if err.Details == nil {
+		t.Fatal("expected details to be populated")
+	}
+	if got, ok := err.Details["daily_remaining"].(float64); !ok || got != 0 {
+		t.Errorf("expected daily_remaining=0, got %v", err.Details["daily_remaining"])
+	}
+	if got, ok := err.Details["retry_after_seconds"].(float64); !ok || got != 3600 {
+		t.Errorf("expected retry_after_seconds=3600, got %v", err.Details["retry_after_seconds"])
+	}
+	if _, exists := err.Details["message"]; exists {
+		t.Error("details should not include message")
+	}
+	if _, exists := err.Details["code"]; exists {
+		t.Error("details should not include code")
 	}
 }

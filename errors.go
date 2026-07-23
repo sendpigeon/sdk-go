@@ -17,6 +17,11 @@ type Error struct {
 	Code    ErrorCode `json:"code"`
 	APICode string    `json:"api_code,omitempty"`
 	Status  int       `json:"status,omitempty"`
+	// Details holds extra fields from the API's error response beyond
+	// message/code - e.g. for HOURLY_LIMIT_EXCEEDED / DAILY_LIMIT_EXCEEDED:
+	// hourly_remaining, daily_remaining, retry_after_seconds, etc. Shape
+	// depends on APICode.
+	Details map[string]interface{} `json:"details,omitempty"`
 }
 
 // Error implements the error interface.
@@ -35,12 +40,14 @@ func NewError(code ErrorCode, message string) *Error {
 	}
 }
 
-// NewAPIError creates a new API error with status and API code.
-func NewAPIError(status int, apiCode, message string) *Error {
+// NewAPIError creates a new API error with status, API code, and any extra
+// details from the API's error response.
+func NewAPIError(status int, apiCode, message string, details map[string]interface{}) *Error {
 	return &Error{
 		Code:    ErrorCodeAPI,
 		Status:  status,
 		APICode: apiCode,
 		Message: message,
+		Details: details,
 	}
 }

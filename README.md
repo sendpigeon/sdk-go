@@ -290,6 +290,9 @@ if err != nil {
     case sendpigeon.ErrorCodeAPI:
         // API error (validation, auth, etc.)
         fmt.Printf("API Error [%s]: %s (status: %d)\n", err.APICode, err.Message, err.Status)
+        // err.Details holds extra fields beyond message/code, e.g. for
+        // HOURLY_LIMIT_EXCEEDED / DAILY_LIMIT_EXCEEDED:
+        // {"daily_limit": 5000, "daily_used": 5000, "daily_remaining": 0, "retry_after_seconds": 3600}
     case sendpigeon.ErrorCodeNetwork:
         // Network/connection error
         fmt.Printf("Network Error: %s\n", err.Message)

@@ -146,21 +146,30 @@ func (c *httpClient) request(ctx context.Context, method, path string, body inte
 			return respBody, nil
 		}
 
-		// Parse error response
-		var apiErr struct {
-			Error struct {
-				Code    string `json:"code"`
-				Message string `json:"message"`
-			} `json:"error"`
-		}
+		// Parse error response - the API returns a flat body, e.g.
+		// {"message": "...", "code": "...", "daily_remaining": 0, ...},
+		// not nested under an "error" key.
+		var apiErr map[string]interface{}
 		json.Unmarshal(respBody, &apiErr)
 
-		message := apiErr.Error.Message
+		message, _ := apiErr["message"].(string)
 		if message == "" {
 			message = fmt.Sprintf("HTTP %d", resp.StatusCode)
 		}
+		code, _ := apiErr["code"].(string)
 
-		lastErr = NewAPIError(resp.StatusCode, apiErr.Error.Code, message)
+		var details map[string]interface{}
+		for k, v := range apiErr {
+			if k == "message" || k == "code" {
+				continue
+			}
+			if details == nil {
+				details = make(map[string]interface{})
+			}
+			details[k] = v
+		}
+
+		lastErr = NewAPIError(resp.StatusCode, code, message, details)
 
 		// Should retry?
 		if resp.StatusCode == 429 || resp.StatusCode >= 500 {

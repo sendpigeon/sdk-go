@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0
+
+- `Error.Details` now exposes extra error-response fields beyond `message`/`code` (e.g. `daily_remaining`, `retry_after_seconds` on `HOURLY_LIMIT_EXCEEDED` / `DAILY_LIMIT_EXCEEDED`) instead of silently discarding them
+- Fixed error parsing to read the API's actual flat response body (`{"message":..., "code":...}`); it previously expected a nested `{"error": {...}}` shape that never matched the real API, so `APICode`/`Message` were always empty/generic against production
+
 ## 0.6.0
 
 - Add Events API (`Events.Send`, `List`, `ContactEvents`)
