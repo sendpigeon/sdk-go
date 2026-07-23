@@ -17,6 +17,8 @@ type Client struct {
 	Tracking     *TrackingService
 	Contacts     *ContactsService
 	Broadcasts   *BroadcastsService
+	Events       *EventsService
+	Sequences    *SequencesService
 }
 
 // New creates a new SendPigeon client.
@@ -41,6 +43,8 @@ func New(apiKey string, opts *ClientOptions) *Client {
 		Tracking:     &TrackingService{http: http},
 		Contacts:     &ContactsService{http: http},
 		Broadcasts:   &BroadcastsService{http: http},
+		Events:       &EventsService{http: http},
+		Sequences:    &SequencesService{http: http},
 	}
 }
 

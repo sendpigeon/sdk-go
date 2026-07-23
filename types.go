@@ -555,3 +555,233 @@ type BroadcastAnalytics struct {
 	OpensOverTime   []OpensOverTime   `json:"opensOverTime"`
 	LinkPerformance []LinkPerformance `json:"linkPerformance"`
 }
+
+// ─── Events ───
+
+type Event struct {
+	ID         string                 `json:"id"`
+	ContactID  string                 `json:"contactId"`
+	Name       string                 `json:"name"`
+	Properties map[string]interface{} `json:"properties,omitempty"`
+	CreatedAt  string                 `json:"createdAt"`
+}
+
+type FireEventRequest struct {
+	Email             string                 `json:"email"`
+	EventName         string                 `json:"eventName"`
+	Properties        map[string]interface{} `json:"properties,omitempty"`
+	ContactProperties map[string]interface{} `json:"contactProperties,omitempty"`
+	Tags              []string               `json:"tags,omitempty"`
+	IdempotencyKey    string                 `json:"idempotencyKey,omitempty"`
+}
+
+type FireEventResponse struct {
+	EventID            string                   `json:"eventId"`
+	ContactID          string                   `json:"contactId"`
+	ContactCreated     bool                     `json:"contactCreated"`
+	SequencesTriggered []TriggeredSequence      `json:"sequencesTriggered"`
+}
+
+type TriggeredSequence struct {
+	SequenceID   string `json:"sequenceId"`
+	EnrollmentID string `json:"enrollmentId"`
+}
+
+type ListEventsOptions struct {
+	Name      string
+	ContactID string
+	Since     string
+	Until     string
+	Limit     int
+	Offset    int
+}
+
+// ─── Sequences ───
+
+type SequenceStatus = string
+
+const (
+	SequenceStatusDraft    SequenceStatus = "DRAFT"
+	SequenceStatusActive   SequenceStatus = "ACTIVE"
+	SequenceStatusPaused   SequenceStatus = "PAUSED"
+	SequenceStatusArchived SequenceStatus = "ARCHIVED"
+)
+
+type SequenceTriggerType = string
+
+const (
+	TriggerTypeEvent          SequenceTriggerType = "EVENT"
+	TriggerTypeContactCreated SequenceTriggerType = "CONTACT_CREATED"
+	TriggerTypeTagAdded       SequenceTriggerType = "TAG_ADDED"
+	TriggerTypeAPICall        SequenceTriggerType = "API_CALL"
+	TriggerTypeDateProperty   SequenceTriggerType = "DATE_PROPERTY"
+)
+
+type SequenceStepType = string
+
+const (
+	StepTypeSendEmail     SequenceStepType = "SEND_EMAIL"
+	StepTypeWait          SequenceStepType = "WAIT"
+	StepTypeBranch        SequenceStepType = "BRANCH"
+	StepTypeUpdateContact SequenceStepType = "UPDATE_CONTACT"
+	StepTypeWebhook       SequenceStepType = "WEBHOOK"
+)
+
+type EnrollmentStatus = string
+
+const (
+	EnrollmentStatusActive    EnrollmentStatus = "ACTIVE"
+	EnrollmentStatusPaused    EnrollmentStatus = "PAUSED"
+	EnrollmentStatusCompleted EnrollmentStatus = "COMPLETED"
+	EnrollmentStatusExited    EnrollmentStatus = "EXITED"
+	EnrollmentStatusFailed    EnrollmentStatus = "FAILED"
+)
+
+type SequenceStep struct {
+	ID                string                 `json:"id"`
+	SequenceID        string                 `json:"sequenceId"`
+	SequenceVersion   int                    `json:"sequenceVersion"`
+	Type              SequenceStepType       `json:"type"`
+	Config            map[string]interface{} `json:"config"`
+	Position          int                    `json:"position"`
+	NextStepID        *string                `json:"nextStepId"`
+	BranchTrueStepID  *string                `json:"branchTrueStepId"`
+	BranchFalseStepID *string                `json:"branchFalseStepId"`
+	EnteredCount      int                    `json:"enteredCount"`
+	CompletedCount    int                    `json:"completedCount"`
+	CreatedAt         string                 `json:"createdAt"`
+}
+
+type Sequence struct {
+	ID             string                 `json:"id"`
+	OrganizationID string                 `json:"organizationId"`
+	Name           string                 `json:"name"`
+	Description    *string                `json:"description"`
+	Status         SequenceStatus         `json:"status"`
+	TriggerType    SequenceTriggerType    `json:"triggerType"`
+	TriggerConfig  map[string]interface{} `json:"triggerConfig"`
+	TriggerFilters map[string]interface{} `json:"triggerFilters"`
+	ReentryAllowed bool                   `json:"reentryAllowed"`
+	ReentryDelay   *int                   `json:"reentryDelay"`
+	EntryLimit     *int                   `json:"entryLimit"`
+	Version        int                    `json:"version"`
+	TotalEnrolled  int                    `json:"totalEnrolled"`
+	ActiveEnrolled int                    `json:"activeEnrolled"`
+	CompletedCount int                    `json:"completedCount"`
+	ExitedCount    int                    `json:"exitedCount"`
+	CreatedAt      string                 `json:"createdAt"`
+	UpdatedAt      string                 `json:"updatedAt"`
+}
+
+type SequenceWithSteps struct {
+	Sequence
+	Steps []SequenceStep `json:"steps"`
+}
+
+type CreateSequenceRequest struct {
+	Name           string                 `json:"name"`
+	Description    string                 `json:"description,omitempty"`
+	TriggerType    SequenceTriggerType    `json:"triggerType"`
+	TriggerConfig  map[string]interface{} `json:"triggerConfig,omitempty"`
+	TriggerFilters map[string]interface{} `json:"triggerFilters,omitempty"`
+	ReentryAllowed bool                   `json:"reentryAllowed,omitempty"`
+	ReentryDelay   *int                   `json:"reentryDelay,omitempty"`
+	EntryLimit     *int                   `json:"entryLimit,omitempty"`
+}
+
+type UpdateSequenceRequest struct {
+	Name           *string                `json:"name,omitempty"`
+	Description    *string                `json:"description,omitempty"`
+	TriggerConfig  map[string]interface{} `json:"triggerConfig,omitempty"`
+	TriggerFilters map[string]interface{} `json:"triggerFilters,omitempty"`
+	ReentryAllowed *bool                  `json:"reentryAllowed,omitempty"`
+	ReentryDelay   *int                   `json:"reentryDelay,omitempty"`
+	EntryLimit     *int                   `json:"entryLimit,omitempty"`
+}
+
+type AddStepRequest struct {
+	Type              SequenceStepType       `json:"type"`
+	Config            map[string]interface{} `json:"config"`
+	Position          *int                   `json:"position,omitempty"`
+	NextStepID        string                 `json:"nextStepId,omitempty"`
+	BranchTrueStepID  string                 `json:"branchTrueStepId,omitempty"`
+	BranchFalseStepID string                 `json:"branchFalseStepId,omitempty"`
+}
+
+type EnrollContact struct {
+	Email     string `json:"email,omitempty"`
+	ContactID string `json:"contactId,omitempty"`
+}
+
+type EnrollRequest struct {
+	Contacts    []EnrollContact        `json:"contacts"`
+	TriggerData map[string]interface{} `json:"triggerData,omitempty"`
+}
+
+type EnrollResultItem struct {
+	EnrollmentID *string `json:"enrollmentId"`
+	ContactID    string  `json:"contactId"`
+	Status       string  `json:"status"`
+	Skipped      bool    `json:"skipped"`
+	Reason       string  `json:"reason,omitempty"`
+}
+
+type EnrollResult struct {
+	Enrollments []EnrollResultItem `json:"enrollments"`
+}
+
+type SequenceEnrollment struct {
+	ID              string                 `json:"id"`
+	SequenceID      string                 `json:"sequenceId"`
+	ContactID       string                 `json:"contactId"`
+	ContactEmail    string                 `json:"contactEmail,omitempty"`
+	SequenceVersion int                    `json:"sequenceVersion"`
+	Status          EnrollmentStatus       `json:"status"`
+	CurrentStepID   *string                `json:"currentStepId"`
+	ExitReason      *string                `json:"exitReason"`
+	EnteredAt       string                 `json:"enteredAt"`
+	CompletedAt     *string                `json:"completedAt"`
+	ExitedAt        *string                `json:"exitedAt"`
+	NextActionAt    *string                `json:"nextActionAt"`
+	TriggerData     map[string]interface{} `json:"triggerData"`
+}
+
+type ListSequencesOptions struct {
+	Status SequenceStatus
+	Limit  int
+	Offset int
+}
+
+type ListEnrollmentsOptions struct {
+	Status EnrollmentStatus
+	Limit  int
+	Offset int
+}
+
+type EmailStepStats struct {
+	Sent      int     `json:"sent"`
+	Opened    int     `json:"opened"`
+	Clicked   int     `json:"clicked"`
+	Bounced   int     `json:"bounced"`
+	OpenRate  float64 `json:"openRate"`
+	ClickRate float64 `json:"clickRate"`
+}
+
+type StepAnalytics struct {
+	StepID         string          `json:"stepId"`
+	Type           string          `json:"type"`
+	Position       int             `json:"position"`
+	EnteredCount   int             `json:"enteredCount"`
+	CompletedCount int             `json:"completedCount"`
+	DropOffRate    float64         `json:"dropOffRate"`
+	EmailStats     *EmailStepStats `json:"emailStats"`
+}
+
+type SequenceAnalytics struct {
+	TotalEnrolled  int             `json:"totalEnrolled"`
+	ActiveEnrolled int             `json:"activeEnrolled"`
+	CompletedCount int             `json:"completedCount"`
+	ExitedCount    int             `json:"exitedCount"`
+	CompletionRate float64         `json:"completionRate"`
+	Steps          []StepAnalytics `json:"steps"`
+}

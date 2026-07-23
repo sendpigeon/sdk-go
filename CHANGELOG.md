@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0
+
+- Add Events API (`Events.Send`, `List`, `ContactEvents`)
+- Add Sequences API (`Sequences.Create`, `List`, `Get`, `Update`, `Delete`, `Activate`, `Pause`, `Archive`, `Duplicate`, `Analytics`)
+- Add Sequence Steps API (`AddStep`, `ListSteps`, `DeleteStep`)
+- Add Enrollments API (`Enroll`, `ListEnrollments`, `GetEnrollment`, `PauseEnrollment`, `ResumeEnrollment`, `ExitEnrollment`)
+- Sequence webhook event constants
+
 ## 0.5.0
 
 - Add Contacts API (`Contacts.List`, `Create`, `Batch`, `Get`, `Update`, `Delete`, `Unsubscribe`, `Resubscribe`, `Stats`, `Tags`)

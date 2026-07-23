@@ -19,6 +19,15 @@ const (
 	WebhookEventOpened     = "email.opened"
 	WebhookEventClicked    = "email.clicked"
 	WebhookEventTest       = "webhook.test"
+
+	WebhookEventSequenceActivated = "sequence.activated"
+	WebhookEventSequencePaused    = "sequence.paused"
+	WebhookEventSequenceArchived  = "sequence.archived"
+	WebhookEventEnrollmentStarted = "enrollment.started"
+	WebhookEventEnrollmentCompleted = "enrollment.completed"
+	WebhookEventEnrollmentExited    = "enrollment.exited"
+	WebhookEventStepExecuted        = "enrollment.step.executed"
+	WebhookEventStepFailed          = "enrollment.step.failed"
 )
 
 // WebhookPayloadData represents the typed webhook payload data.
